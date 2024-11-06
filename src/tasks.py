@@ -27,6 +27,7 @@ def sum_film_in_category():
 
 # endregion
 
+
 # region Task 2
 # --Output the 10 actors whose films have rented the most, sorted in descending order.--
 
@@ -73,7 +74,8 @@ def choose_cat_film_most_money():
 # --Output the titles of films that are not in the inventory.--
 
 def choose_not_in_film():
-    df_joined = df_film.join(df_inventory, df_film.film_id == df_inventory.film_id,how = 'left_anti').select(df_film['title'])
+    df_joined = df_film.join(df_inventory, df_film.film_id == df_inventory.film_id, how='left_anti').select(
+        df_film['title'])
 
     df_joined.show()
 
@@ -81,8 +83,31 @@ def choose_not_in_film():
 # endregion
 
 
+# region Task 5
+# --Output the top 3 actors who have appeared in the most films in the ‘Children’ category.
+# If several actors have the same number of films, output all...--
+
+def choose_top_actors():
+    df_joined = df_actor.join(df_film_actor, df_actor.actor_id == df_film_actor.actor_id, how='inner')\
+                        .join(df_film_category, df_film_actor.film_id == df_film_category.film_id, how='inner')\
+                        .join(df_category, df_film_category.category_id == df_category.category_id, how='inner')
 
 
+    df_filtred = df_joined.filter(df_category['name'] == 'Children') \
+                            .groupBy(df_actor['first_name'])\
+                            .agg(count("*").alias("count_of_actors"))\
+                            .orderBy(desc("count_of_actors"))
+
+    top_act = df_filtred.limit(3)
+    top_act.show()
+# endregion
+
+# region Task 6
+# --Output cities with the number of active and inactive customers (active - customer.active = 1).
+# Sort by the number of inactive customers in descending order.--
+
+
+# endregion
 
 if __name__ == '__main__':
-    choose_not_in_film()
+    choose_top_actors()
