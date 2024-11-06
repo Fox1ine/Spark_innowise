@@ -69,5 +69,20 @@ def choose_cat_film_most_money():
 # endregion
 
 
+# region Task 4
+# --Output the titles of films that are not in the inventory.--
+
+def choose_not_in_film():
+    df_joined = df_film.join(df_inventory, df_film.film_id == df_inventory.film_id,how = 'left_anti').select(df_film['title'])
+
+    df_joined.show()
+
+
+# endregion
+
+
+
+
+
 if __name__ == '__main__':
-    choose_cat_film_most_money()
+    choose_not_in_film()
