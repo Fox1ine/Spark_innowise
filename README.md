@@ -1,6 +1,4 @@
-<<<<<<< HEAD
-# Spark_innowise
-=======
+
 # PySpark Data with Pagila Database
 
 This project demonstrates data analysis using PySpark on tables loaded from the PostgreSQL **Pagila** database. The database is a demo dataset, a variant of the Sakila database for PostgreSQL, which contains information about films, actors, customers, rentals, and more.
