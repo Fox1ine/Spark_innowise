@@ -7,6 +7,8 @@ from pyspark.sql.functions import *
 from pyspark.sql.types import StringType, ArrayType
 from pyspark.sql.types import *
 from setuptools.command.alias import alias
+from unicodedata import category
+from pyspark.sql.functions import col, sum as spark_sum, desc, unix_timestamp, expr
 from config.config import *
 from pyspark.sql import functions as f
 from src.dataframes import *
@@ -129,11 +131,36 @@ def choose_cities():
 # endregion
 
 # region Task 7
-# --Output cities with the number of active and inactive customers (active - customer.active = 1).
-# Sort by the number of inactive customers in descending order.--
+# Output the category of films that have the highest number of total rental hours in cities (customer.address_id in this city),
+# and that start with the letter ‘a’. Do the same for cities with a ‘-’ symbol.--
+
+def choose_category_hours_in_cities():
+    df_joined = df_category \
+        .join(df_film_category, df_category.category_id == df_film_category.category_id, how='inner') \
+        .join(df_inventory, df_film_category.film_id == df_inventory.film_id, how='inner') \
+        .join(df_rental, df_inventory.inventory_id == df_rental.inventory_id, how='inner') \
+        .join(df_customer, df_rental.customer_id == df_customer.customer_id, how='inner') \
+        .join(df_address, df_customer.address_id == df_address.address_id, how='inner') \
+        .join(df_city, df_address.city_id == df_city.city_id, how='inner')
+
+    df_filtred = df_joined\
+        .filter((col('city').startswith('a')) | (col('city').contains('-')))
+
+    df_with_time = df_filtred\
+        .withColumn('rental_hours',
+        (unix_timestamp(col('return_date')) - unix_timestamp(col('rental_date'))) / 3600
+    )
+
+    category_hours = df_with_time\
+        .groupBy('name') \
+        .agg(spark_sum("rental_hours").alias("total_rental_hours")) \
+        .orderBy(desc("total_rental_hours"))
 
 
+    category_hours.show()
+
+# endregion
 
 
 if __name__ == '__main__':
-    choose_cities()
+    choose_category_hours_in_cities()
