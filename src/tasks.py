@@ -27,7 +27,6 @@ def sum_film_in_category():
 
 # endregion
 
-
 # region Task 2
 # --Output the 10 actors whose films have rented the most, sorted in descending order.--
 
@@ -69,7 +68,6 @@ def choose_cat_film_most_money():
 
 # endregion
 
-
 # region Task 4
 # --Output the titles of films that are not in the inventory.--
 
@@ -81,7 +79,6 @@ def choose_not_in_film():
 
 
 # endregion
-
 
 # region Task 5
 # --Output the top 3 actors who have appeared in the most films in the ‘Children’ category.
@@ -106,8 +103,37 @@ def choose_top_actors():
 # --Output cities with the number of active and inactive customers (active - customer.active = 1).
 # Sort by the number of inactive customers in descending order.--
 
+def choose_cities():
+    df_joined = df_address.join(df_city,df_address.city_id == df_city.city_id, how='inner')\
+                            .join(df_customer, df_address.address_id == df_customer.address_id, how='inner')
+
+    df_filtred_data = df_joined.groupBy(df_city['city'])\
+                                .agg(
+                                    sum((df_customer['active'] == 1).cast('int')).alias('active_customers'),
+                                    sum((df_city['city'] == "0").cast('int')).alias('inactive_customers'),
+                                    )\
+                                .orderBy(desc("inactive_customers"))
+
+    active_customers_df = df_filtred_data.select("city", "active_customers")\
+                                    .filter("active_customers > 0")\
+                                    .orderBy(desc("active_customers"))
+
+    inactive_customers_df = df_filtred_data.select("city", "inactive_customers")\
+                                      .filter("inactive_customers == 0")\
+                                      .orderBy(desc("inactive_customers"))
+
+
+    active_customers_df.show()
+    inactive_customers_df.show()
 
 # endregion
 
+# region Task 7
+# --Output cities with the number of active and inactive customers (active - customer.active = 1).
+# Sort by the number of inactive customers in descending order.--
+
+
+
+
 if __name__ == '__main__':
-    choose_top_actors()
+    choose_cities()
